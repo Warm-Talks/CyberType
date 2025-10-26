@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warm Talks | CyberType</title>
+    <!-- Logo -->
+    <link rel="icon" href="logo.png" type="image/png">
+    <!-- Png / icon -->>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/ce0acd39a1.js" crossorigin="anonymous"></script>
+    <style>
+        /* Custom styles for the futuristic/neon look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117; /* Default: Dark Mode Background */
+            color: #e5e7eb; /* Default: Dark Mode Text */
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* --- DARK MODE SPECIFIC STYLES (Overrides applied to simulate Tailwind dark: prefix) --- */
+        
+        /* Focus glow for input */
+        #input-area:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 200, 255, 0.8); /* Cyan glow */
+        }
+
+        /* Neon button effect */
+        .neon-button {
+            transition: all 0.3s ease;
+            box-shadow: 0 0 5px #00c8ff, 0 0 10px #00c8ff;
+            text-shadow: 0 0 2px #00c8ff;
+        }
+
+        .neon-button:hover {
+            box-shadow: 0 0 15px #00c8ff, 0 0 30px #00c8ff;
+            background-color: #083c4d;
+        }
+
+        /* Neon text effect for navbar links */
+        .neon-text {
+            text-shadow: 0 0 5px rgba(0, 200, 255, 0.5);
+        }
+        .neon-text:hover {
+            text-shadow: 0 0 10px rgba(0, 200, 255, 1), 0 0 20px rgba(0, 200, 255, 0.8);
+        }
+        
+        /* Blinking cursor effect for the input area when active */
+        .typing-text-span {
+            font-weight: 700;
+            padding: 2px 0;
+            border-bottom: 2px solid transparent;
+            transition: color 0.1s;
+        }
+
+        .correct {
+            color: #4CAF50; /* Green */
+        }
+
+        .incorrect {
+            color: #F44336; /* Red */
+            background-color: rgba(244, 67, 54, 0.2);
+            border-bottom: 2px solid #F44336;
+        }
+
+        .current {
+            border-bottom-color: #00c8ff; /* Cyan cursor line */
+            animation: pulse 1.2s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            from { opacity: 1; }
+            to { opacity: 0.5; }
+        }
+
+        /* --- LIGHT MODE OVERRIDES (Applied when body has .light-mode class) --- */
+        body.light-mode {
+            background-color: #f0f4f8; /* Light Mode Background */
+            color: #1f2937; /* Light Mode Text */
+        }
+        
+        /* Game Container */
+        .light-mode #game-container {
+            background-color: #ffffff;
+            border-color: #60a5fa; /* Blue border */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Header Text */
+        .light-mode h1, .light-mode .text-cyan-400 {
+            color: #1e3a8a; /* Dark blue header */
+        }
+        
+        /* Target Text Display */
+        .light-mode #text-display {
+            background-color: #e5e7eb;
+            border-color: #d1d5db;
+        }
+        
+        .light-mode #target-text {
+            color: #1f2937 !important; /* Dark text for reading */
+        }
+
+        /* Input Area */
+        .light-mode #input-area {
+            background-color: #ffffff;
+            color: #1f2937;
+            border-color: #3b82f6;
+        }
+        .light-mode #input-area:focus {
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.8); /* Blue glow */
+        }
+
+        /* Stats Blocks */
+        .light-mode #stats > div {
+            background-color: #e5e7eb;
+            border-bottom-color: #3b82f6;
+        }
+        .light-mode #stats p {
+            color: #1f2937;
+        }
+
+        /* Start Button */
+        .light-mode .neon-button {
+            background-color: #3b82f6;
+            color: #ffffff;
+            box-shadow: 0 0 5px #3b82f6, 0 0 10px #3b82f6;
+            text-shadow: none;
+        }
+
+        .light-mode .neon-button:hover {
+            background-color: #2563eb;
+            box-shadow: 0 0 15px #3b82f6, 0 0 30px #3b82f6;
+        }
+
+        /* Navigation Links and Logo Area */
+        .light-mode header {
+            border-color: #d1d5db;
+        }
+        .light-mode .neon-text {
+            color: #1e3a8a;
+            text-shadow: none;
+        }
+        .light-mode a {
+            color: #4b5563; /* Grey text */
+        }
+        .light-mode a:hover {
+            color: #2563eb; /* Blue hover */
+        }
+        
+        /* Cursor and Typed Text in Light Mode */
+        .light-mode .current {
+            border-bottom-color: #3b82f6; /* Blue cursor line */
+        }
+        .light-mode .incorrect {
+             background-color: rgba(244, 67, 54, 0.1); /* Lighter red background */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4">
+
+    <!-- Navbar/Header -->
+    <header class="w-full max-w-6xl py-4 mb-10 border-b border-gray-700/50">
+        <nav class="flex justify-between items-center px-4">
+            <div class="flex items-center space-x-3">
+                <!-- Logo Image -->
+                <a href="https://warmtalks.netlify.app/">
+                <img src="logo.png
+                " alt="CyberType Logo" class="h-8 w-auto">
+                <div class="text-2xl font-bold text-cyan-400 tracking-widest neon-text hidden sm:block">CYBERTYPE</div>
+                </a>
+            </div>
+            
+            <div class="flex items-center space-x-4 sm:space-x-8 text-sm sm:text-lg">
+                <a href="https://discord.com/invite/5QxACuSHq7" class="text-gray-400 hover:text-cyan-400 transition duration-200 neon-text"><i class="fa-brands fa-discord"></i></a>
+                <a href="mailto:business.warmtalks@gmail.com" class="text-gray-400 hover:text-cyan-400 transition duration-200 neon-text"><i class="fa-solid fa-inbox"></i></a>
+                <a href="https://warmtalks.netlify.app/" class="text-gray-400 hover:text-cyan-400 transition duration-200 neon-text"><i class="fa-solid fa-globe"></i></a>
+                
+                <!-- Theme Toggle Button -->
+                <button id="theme-toggle" class="text-gray-400 hover:text-cyan-400 transition duration-200 neon-text p-2 rounded-full">
+                    <!-- Moon Icon (Visible in Dark Mode by default) -->
+                    <svg id="moon-icon" class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                    <!-- Sun Icon (Hidden in Dark Mode by default) -->
+                    <svg id="sun-icon" class="h-6 w-6 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <div id="game-container" class="w-full max-w-4xl bg-gray-800 rounded-xl shadow-2xl p-8 md:p-12 border border-cyan-700 mb-16">
+        
+        <!-- Header -->
+        <h1 class="text-3xl md:text-4xl font-bold text-center mb-6 text-cyan-400 tracking-wider uppercase">
+            CyberType Protocol
+        </h1>
+        <p class="text-sm text-gray-400 text-center mb-10">
+            Initiate data transfer by typing the sequence below.
+        </p>
+
+        <!-- Display Area -->
+        <div id="text-display" class="min-h-[100px] bg-gray-900 p-6 rounded-lg mb-8 border border-gray-700 leading-relaxed select-none">
+            <!-- Responsive text size: text-xl for mobile, md:text-2xl for desktop -->
+            <p id="target-text" class="text-gray-300 text-xl md:text-2xl"></p>
+        </div>
+
+        <!-- Input and Button Area -->
+        <div class="flex flex-col gap-4">
+            <input 
+                type="text" 
+                id="input-area" 
+                placeholder="Type here to begin..." 
+                class="w-full p-4 rounded-lg text-lg bg-gray-700 text-white placeholder-gray-400 border border-cyan-400 focus:ring-4 focus:ring-cyan-500/50"
+                disabled
+            >
+            <button 
+                id="start-button" 
+                class="neon-button w-full py-4 text-xl font-semibold bg-cyan-600 text-white rounded-lg transition duration-300 ease-in-out"
+            >
+                START SYSTEM
+            </button>
+        </div>
+
+        <!-- Stats and Result Area -->
+        <!-- Responsive grid: 1 column on mobile, 2 columns on small screens and up -->
+        <div id="stats" class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
+            <div class="p-4 bg-gray-700 rounded-lg border-b-4 border-cyan-500">
+                <p class="text-2xl font-bold text-white"><span id="wpm-value">0</span></p>
+                <p class="text-sm text-gray-400 mt-1">WPM (Words/Min)</p>
+            </div>
+            <div class="p-4 bg-gray-700 rounded-lg border-b-4 border-cyan-500">
+                <p class="text-2xl font-bold text-white"><span id="accuracy-value">100%</span></p>
+                <p class="text-sm text-gray-400 mt-1">Accuracy</p>
+            </div>
+        </div>
+
+        <!-- Result/Message Box (Hidden initially) -->
+        <div id="result-message" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
+            <div class="bg-gray-800 p-8 rounded-xl border border-cyan-400 shadow-2xl w-full max-w-sm text-center">
+                <h2 class="text-3xl font-bold text-cyan-400 mb-4">PROTOCOL COMPLETE!</h2>
+                <p class="text-lg text-gray-300 mb-6">Your Data Transfer Speed:</p>
+                <p class="text-5xl font-extrabold text-white mb-6"><span id="final-wpm">0</span> WPM</p>
+                <button 
+                    id="restart-button" 
+                    class="neon-button w-full py-3 text-lg font-semibold bg-cyan-600 text-white rounded-lg"
+                >
+                    RE-INITIATE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer/Copyright -->
+    <footer class="w-full max-w-4xl text-center pb-4">
+        <p class="text-sm text-gray-600">
+            &copy; 2025 Warm Talks pvt. . All Rights Reserved.
+        </p>
+    </footer>
+
+    <script>
+        // --- GAME VARIABLES & SETUP ---
+        const textSource = [
+            "Execute phase one upload sequence.",
+            "System diagnostics report zero errors.",
+            "The mainframe firewall is nominal.",
+            "Bypass the optical scanner security grid.",
+            "Access the restricted sector now.",
+            "Initiate data stream protocol beta.",
+            "Secure the perimeter gates immediately.",
+            "Code is law in this cyber domain.",
+            "Monitor the quantum fluctuations.",
+            "Deciphering the ancient encryption key.",
+            "Temporal displacement detected nearby.",
+            "Deploy defensive turret array three.",
+            "Quantum entanglement stabilized.",
+        ];
+
+        const targetTextElement = document.getElementById('target-text');
+        const inputArea = document.getElementById('input-area');
+        const startButton = document.getElementById('start-button');
+        const wpmValue = document.getElementById('wpm-value');
+        const accuracyValue = document.getElementById('accuracy-value');
+        const resultMessage = document.getElementById('result-message');
+        const finalWPM = document.getElementById('final-wpm');
+        const restartButton = document.getElementById('restart-button');
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+
+        let targetText = '';
+        let startTime = null;
+        let running = false;
+        let totalCharsTyped = 0;
+        let correctCharsTyped = 0;
+        let currentTextIndex = 0;
+
+        // --- THEME TOGGLE LOGIC ---
+        
+        /**
+         * Toggles the light-mode class and updates the icon.
+         * Stores the preference in local storage.
+         */
+        function toggleTheme() {
+            const isLightMode = document.body.classList.toggle('light-mode');
+            
+            if (isLightMode) {
+                localStorage.setItem('theme', 'light');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+                themeToggle.classList.remove('neon-text', 'hover:text-cyan-400');
+                themeToggle.classList.add('text-gray-800', 'hover:text-blue-600');
+            } else {
+                localStorage.setItem('theme', 'dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+                themeToggle.classList.add('neon-text', 'hover:text-cyan-400');
+                themeToggle.classList.remove('text-gray-800', 'hover:text-blue-600');
+            }
+        }
+        
+        /**
+         * Loads the saved theme preference on page load.
+         */
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                // Manually apply light mode
+                document.body.classList.add('light-mode');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+                themeToggle.classList.remove('neon-text', 'hover:text-cyan-400');
+                themeToggle.classList.add('text-gray-800', 'hover:text-blue-600');
+            } else {
+                // Ensure dark mode initial state is set up
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        }
+
+        themeToggle.addEventListener('click', toggleTheme);
+        loadTheme();
+        
+        // --- CORE GAME FUNCTIONS ---
+
+        /**
+         * Initializes the game state and UI for a new round.
+         */
+        function initializeGame() {
+            // Select a new random phrase
+            currentTextIndex = Math.floor(Math.random() * textSource.length);
+            targetText = textSource[currentTextIndex];
+            
+            // Reset state
+            startTime = null;
+            running = false;
+            totalCharsTyped = 0;
+            correctCharsTyped = 0;
+
+            // Reset UI
+            inputArea.value = '';
+            inputArea.disabled = true;
+            inputArea.placeholder = 'Type here to begin...';
+            startButton.textContent = 'START SYSTEM';
+            startButton.disabled = false;
+            wpmValue.textContent = '0';
+            accuracyValue.textContent = '100%';
+            resultMessage.classList.add('hidden');
+
+            renderText();
+        }
+
+        /**
+         * Renders the target text with color coding for correct, incorrect, and current character.
+         */
+        function renderText() {
+            targetTextElement.innerHTML = '';
+            const typedText = inputArea.value;
+            
+            for (let i = 0; i < targetText.length; i++) {
+                const targetChar = targetText[i];
+                const typedChar = typedText[i];
+                const span = document.createElement('span');
+                span.textContent = targetChar;
+                span.classList.add('typing-text-span');
+
+                if (i < typedText.length) {
+                    // Character has been typed
+                    if (targetChar === typedChar) {
+                        span.classList.add('correct');
+                    } else {
+                        span.classList.add('incorrect');
+                    }
+                }
+
+                if (i === typedText.length && i < targetText.length) {
+                    // This is the next character to be typed (the cursor)
+                    span.classList.add('current');
+                }
+
+                targetTextElement.appendChild(span);
+            }
+        }
+
+        /**
+         * Calculates and updates WPM and Accuracy in real-time.
+         */
+        function updateStats() {
+            if (!running || !startTime) return;
+
+            const timeElapsed = (Date.now() - startTime) / 1000; // time in seconds
+            
+            // WPM calculation: (Correct Characters / 5) / (Time Elapsed in Minutes)
+            const minutes = timeElapsed / 60;
+            const wpm = minutes > 0 ? Math.round((correctCharsTyped / 5) / minutes) : 0;
+            
+            // Accuracy calculation
+            const accuracy = totalCharsTyped > 0 ? ((correctCharsTyped / totalCharsTyped) * 100).toFixed(1) : 100;
+
+            wpmValue.textContent = wpm;
+            accuracyValue.textContent = `${accuracy}%`;
+        }
+
+        /**
+         * Ends the game and displays the final results.
+         */
+        function endGame() {
+            running = false;
+            inputArea.disabled = true;
+            
+            // Calculate final WPM and display results
+            updateStats(); 
+            finalWPM.textContent = wpmValue.textContent;
+            resultMessage.classList.remove('hidden');
+        }
+
+        // --- EVENT HANDLERS ---
+
+        startButton.addEventListener('click', () => {
+            if (running) return;
+
+            running = true;
+            startButton.textContent = 'TYPING...';
+            startButton.disabled = true;
+
+            inputArea.disabled = false;
+            inputArea.focus();
+            inputArea.placeholder = 'Type the sequence now...';
+            startTime = Date.now();
+        });
+
+        restartButton.addEventListener('click', () => {
+            initializeGame();
+        });
+
+        inputArea.addEventListener('input', () => {
+            if (!running) {
+                // Ignore input if the game hasn't officially started via the button
+                inputArea.value = '';
+                return;
+            }
+
+            const typedText = inputArea.value;
+            const typedLength = typedText.length;
+            
+            // Track total and correct characters
+            totalCharsTyped = typedLength;
+            correctCharsTyped = 0;
+
+            for(let i = 0; i < typedLength; i++) {
+                if (targetText[i] === typedText[i]) {
+                    correctCharsTyped++;
+                }
+            }
+            
+            renderText();
+            updateStats();
+
+            // Check for completion
+            if (typedLength === targetText.length) {
+                endGame();
+            }
+        });
+        
+        // Prevent typing non-displayable characters and backspace from interfering with cursor
+        inputArea.addEventListener('keydown', (e) => {
+             // If the length of the typed text equals the target text length, prevent further typing
+            if (inputArea.value.length >= targetText.length && e.key !== 'Backspace') {
+                e.preventDefault();
+            }
+            
+            // Check for space when it shouldn't be allowed (like at the start, or double space)
+            if (e.key === ' ' && inputArea.value.length === 0) {
+                e.preventDefault(); // Don't start with a space
+            }
+        });
+
+        // Initialize the game when the page loads
+        window.onload = initializeGame;
+
+    </script>
+</body>
+</html>
